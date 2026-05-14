@@ -1,11 +1,47 @@
 ---
-import Welcome from '../components/Welcome.astro';
-import Layout from '../layouts/Layout.astro';
+import { cloudinaryImagePath } from "../lib/cloudinary";
+import { db, eq, Products, Variants } from "astro:db";
+import Layout from "../layouts/Layout.astro";
 
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+const rows = await db
+  .select()
+  .from(Products)
+  .leftJoin(Variants, eq(Variants.id, Products.defaultVariantId));
+
+const list = rows.map(({ Products: p, Variants: v }) => ({
+  ...p,
+  variant: v,
+  variantCount: Array.isArray(p.variantIds) ? p.variantIds.length : 0,
+  href: `/products/${p.slug}`,
+}));
 ---
 
-<Layout>
-	<Welcome />
+<Layout title="Products">
+  <ul class="grid grid-cols-2 gap-6 sm:grid-cols-3 lg:grid-cols-4">
+    {
+      list.map((p) => (
+        <li>
+          <a href={p.href} class="group block">
+            <img
+              src={cloudinaryImagePath(
+                "w_400,h_400,c_thumb,q_auto,f_auto",
+                p.variant?.imageId,
+              )}
+              alt={p.name}
+              class="object-cover"
+            />
+            <div class="mt-2">
+              <p class="font-medium truncate">{p.name}</p>
+              <p class="text-sm text-gray-500">
+                ${p.variant?.price.toFixed(2)}
+              </p>
+              {p.variantCount > 1 && (
+                <p class="text-xs text-gray-400">{p.variantCount} variants</p>
+              )}
+            </div>
+          </a>
+        </li>
+      ))
+    }
+  </ul>
 </Layout>

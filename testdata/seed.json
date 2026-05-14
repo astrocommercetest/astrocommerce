@@ -1,0 +1,100 @@
+{
+  "brands": [
+    {
+      "id": "brand-1",
+      "name": "Scarpa",
+      "slug": "scarpa",
+      "description": null,
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z",
+      "deletedAt": null
+    },
+    {
+      "id": "brand-2",
+      "name": "Mammut",
+      "slug": "mammut",
+      "description": null,
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z",
+      "deletedAt": null
+    }
+  ],
+  "products": [
+    {
+      "id": "product-1",
+      "name": "Ribelle HD",
+      "slug": "scarpa-ribelle-hd",
+      "description": "Lo scarpone da alpinismo in pelle, leggero, confortevole e Made in Italy",
+      "brandId": "brand-1",
+      "collectionIds": ["attrezzatura", "scarponi", "scarponi-alpinismo"],
+      "variantIds": ["variant-1"],
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z",
+      "deletedAt": null,
+      "defaultVariantId": "variant-1"
+    },
+    {
+      "id": "product-2",
+      "name": "Broad Peak IN Hooded Jacket Men",
+      "slug": "mammut-broad-peak-in-hooded-jacket-men",
+      "description": "Functional performance year-round down jacket",
+      "brandId": "brand-2",
+      "collectionIds": ["abbigliamento", "giacche"],
+      "variantIds": ["variant-3", "variant-4"],
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z",
+      "deletedAt": null,
+      "defaultVariantId": "variant-3"
+    }
+  ],
+  "variants": [
+    {
+      "id": "variant-1",
+      "productId": "product-1",
+      "imageId": "",
+      "price": 369.99,
+      "stockQty": 2,
+      "size": 42,
+      "color": "Arancione",
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z",
+      "deletedAt": null
+    },
+    {
+      "id": "variant-2",
+      "productId": "product-1",
+      "imageId": "",
+      "price": 369.99,
+      "stockQty": 2,
+      "size": 43,
+      "color": "Nero",
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z",
+      "deletedAt": null
+    },
+    {
+      "id": "variant-3",
+      "productId": "product-2",
+      "imageId": "",
+      "price": 299.99,
+      "stockQty": 5,
+      "size": "M",
+      "color": "Red",
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z",
+      "deletedAt": null
+    },
+    {
+      "id": "variant-4",
+      "productId": "product-2",
+      "imageId": "",
+      "price": 320.99,
+      "stockQty": 1,
+      "size": "L",
+      "color": "Black",
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z",
+      "deletedAt": null
+    }
+  ]
+}

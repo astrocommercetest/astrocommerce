@@ -1,0 +1,26 @@
+---
+import { db, eq, Products, Variants, Brands } from "astro:db";
+import Layout from "../../layouts/Layout.astro";
+import Product from "../../features/product/ProductPage.tsx";
+
+const { slug } = Astro.params;
+
+if (!slug) return Astro.redirect("/404");
+
+const rows = await db
+  .select()
+  .from(Products)
+  .innerJoin(Variants, eq(Variants.productId, Products.id))
+  .leftJoin(Brands, eq(Brands.id, Products.brandId))
+  .where(eq(Products.slug, slug));
+
+if (!rows.length) return Astro.redirect("/404");
+
+const product = rows[0].Products;
+const brand = rows[0].Brands;
+const variants = rows.map((r) => r.Variants);
+---
+
+<Layout title={product.name}>
+  <Product product={product} brand={brand} variants={variants} client:load />
+</Layout>

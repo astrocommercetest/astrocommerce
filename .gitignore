@@ -22,3 +22,6 @@ pnpm-debug.log*
 
 # jetbrains setting folder
 .idea/
+
+# Cloudinary upload cache (local only)
+testdata/.image-manifest.json

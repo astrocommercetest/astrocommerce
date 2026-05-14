@@ -1,23 +1,52 @@
-<!doctype html>
-<html lang="en">
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro Basics</title>
-	</head>
-	<body>
-		<slot />
-	</body>
-</html>
+---
+import "../styles/global.css";
+import { Font } from "astro:assets";
+import CartBadge from "../features/cart/CartBadge.tsx";
+import CartSidePanel from "../features/cart/CartSidePanel.tsx";
+import Toaster from "../features/toasts/Toaster";
 
-<style>
-	html,
-	body {
-		margin: 0;
-		width: 100%;
-		height: 100%;
-	}
-</style>
+interface LayoutProps {
+  title?: string;
+  slogan?: string;
+  description?: string;
+}
+const { title, slogan, description } = Astro.props as LayoutProps;
+const baseTitle = "Astro Commerce";
+const baseSlogan = "Astro Commerce";
+const baseDescription =
+  "Discover our exclusive collection of Astro-themed merchandise, from apparel to accessories. Shop now and show off your love for Astro in style!";
+const pageTitle = `${title ?? baseTitle} - ${slogan ?? baseSlogan}`;
+---
+
+<!doctype html>
+<html lang="it">
+  <head>
+    <Font cssVariable="--font-roboto" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" href="/favicon.ico" />
+    <meta name="generator" content={Astro.generator} />
+    <meta name="description" content={description ?? baseDescription} />
+    <title>{pageTitle}</title>
+  </head>
+  <body>
+    <header class="flex items-center gap-16 bg-gray-100 p-4">
+      <a href="/" class="text-lg font-bold">{baseSlogan}</a>
+      <nav>
+        <ul class="flex gap-4">
+          <li><a href="/products" class="hover:underline">Products</a></li>
+          <li><a href="/about" class="hover:underline">About</a></li>
+        </ul>
+      </nav>
+      <div class="ml-auto">
+        <CartBadge client:only="react" />
+      </div>
+    </header>
+    <main class="max-w-4xl mx-auto p-4 mt-16">
+      <slot />
+    </main>
+    <CartSidePanel client:only="react" />
+    <Toaster client:only="react" />
+  </body>
+</html>
