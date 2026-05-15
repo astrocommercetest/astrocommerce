@@ -1,0 +1,13 @@
+---
+import Layout from "../layouts/Layout.astro";
+import RegisterForm from "../features/auth/RegisterForm";
+
+if (Astro.locals.user) {
+  return Astro.redirect("/");
+}
+---
+
+<Layout title="Registrati">
+  <h1 class="text-2xl font-bold mb-6">Crea un account</h1>
+  <RegisterForm client:load />
+</Layout>

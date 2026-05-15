@@ -12,6 +12,9 @@ export default defineConfig({
   output: "server",
   vite: {
     plugins: [tailwindcss()],
+    resolve: {
+      alias: { "@": "/src" },
+    },
   },
 
   fonts: [
