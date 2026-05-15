@@ -1,7 +1,9 @@
 ---
 import "../styles/global.css";
 import { Font } from "astro:assets";
-import CartBadge from "../features/cart/CartBadge.tsx";
+import { db, Collections, Brands } from "astro:db";
+import Navigation from "../features/navigation/Navigation.tsx";
+import { buildMenu } from "../features/navigation/buildMenu";
 import CartSidePanel from "../features/cart/CartSidePanel.tsx";
 import Toaster from "../features/toasts/Toaster";
 
@@ -11,7 +13,12 @@ interface LayoutProps {
   description?: string;
 }
 const { title, slogan, description } = Astro.props as LayoutProps;
-const baseTitle = "Astro Commerce";
+const [collections, brands] = await Promise.all([
+  db.select().from(Collections),
+  db.select().from(Brands),
+]);
+const menuItems = buildMenu(collections, brands);
+const baseTitle = "AstroCommerce";
 const baseSlogan = "Astro Commerce";
 const baseDescription =
   "Discover our exclusive collection of Astro-themed merchandise, from apparel to accessories. Shop now and show off your love for Astro in style!";
@@ -31,19 +38,8 @@ const pageTitle = `${title ?? baseTitle} - ${slogan ?? baseSlogan}`;
     <title>{pageTitle}</title>
   </head>
   <body>
-    <header class="flex items-center gap-16 bg-gray-100 p-4">
-      <a href="/" class="text-lg font-bold">{baseSlogan}</a>
-      <nav>
-        <ul class="flex gap-4">
-          <li><a href="/products" class="hover:underline">Products</a></li>
-          <li><a href="/about" class="hover:underline">About</a></li>
-        </ul>
-      </nav>
-      <div class="ml-auto">
-        <CartBadge client:only="react" />
-      </div>
-    </header>
-    <main class="max-w-4xl mx-auto p-4 mt-16">
+    <Navigation items={menuItems} siteTitle={baseTitle} client:load />
+    <main class="max-w-4xl mx-auto px-6 mt-8 md:mt-16">
       <slot />
     </main>
     <CartSidePanel client:only="react" />

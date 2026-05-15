@@ -1,17 +1,19 @@
 import { persistentMap } from "@nanostores/persistent";
 import { atom, computed } from "nanostores";
+import type { Variants, Skus } from "astro:db";
 
 export const isCartOpen = atom(false);
-import type { Variants } from "astro:db";
 
 type Variant = typeof Variants.$inferSelect;
+type Sku = typeof Skus.$inferSelect;
 
 export type CartItem = {
+  sku: Sku;
   variant: Variant;
   qty: number;
 };
 
-// keyed by variant id, persisted to localStorage
+// keyed by sku id, persisted to localStorage
 export const cartItems = persistentMap<Record<string, CartItem>>(
   "cart:",
   {},
@@ -27,31 +29,31 @@ export const cartCount = computed(cartItems, (items) =>
 
 export const cartTotal = computed(cartItems, (items) =>
   Object.values(items).reduce(
-    (sum, item) => sum + item.variant.price * item.qty,
+    (sum, item) => sum + item.sku.price * item.qty,
     0,
   ),
 );
 
-export function addToCart(variant: Variant, qty = 1) {
-  const existing = cartItems.get()[variant.id];
+export function addToCart(sku: Sku, variant: Variant, qty = 1) {
+  const existing = cartItems.get()[sku.id];
   if (existing) {
-    cartItems.setKey(variant.id, { ...existing, qty: existing.qty + qty });
+    cartItems.setKey(sku.id, { ...existing, qty: existing.qty + qty });
   } else {
-    cartItems.setKey(variant.id, { variant, qty });
+    cartItems.setKey(sku.id, { sku, variant, qty });
   }
 }
 
-export function removeFromCart(variantId: string) {
+export function removeFromCart(skuId: string) {
   const items = { ...cartItems.get() };
-  delete items[variantId];
+  delete items[skuId];
   cartItems.set(items);
 }
 
-export function updateQty(variantId: string, qty: number) {
+export function updateQty(skuId: string, qty: number) {
   if (qty <= 0) {
-    removeFromCart(variantId);
+    removeFromCart(skuId);
   } else {
-    const existing = cartItems.get()[variantId];
-    if (existing) cartItems.setKey(variantId, { ...existing, qty });
+    const existing = cartItems.get()[skuId];
+    if (existing) cartItems.setKey(skuId, { ...existing, qty });
   }
 }

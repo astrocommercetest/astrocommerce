@@ -1,0 +1,107 @@
+---
+import { db, eq, and, sql, Products, Skus, Variants, Collections, Brands as BrandsTable } from "astro:db";
+import Layout from "../layouts/Layout.astro";
+import CataloguePage from "../features/catalogue/CataloguePage.tsx";
+import type { CatalogueProduct, ActiveFilters, FilterOption, PaginationInfo } from "../features/catalogue/types";
+
+const p = Astro.url.searchParams;
+const activeFilters: ActiveFilters = {
+  collection: p.get("collection"),
+  gender:     p.get("gender"),
+  activity:   p.get("activity"),
+  brand:      p.get("brand"),
+};
+const page     = Math.max(1, parseInt(p.get("page") ?? "1"));
+const PAGE_SIZE = 24;
+
+// Build SQL conditions pushed to the DB
+const conditions = [];
+if (activeFilters.collection) {
+  conditions.push(
+    sql`EXISTS (SELECT 1 FROM json_each(${Products.collectionIds}) WHERE value = ${activeFilters.collection})`
+  );
+}
+if (activeFilters.gender) {
+  conditions.push(
+    sql`(${Products.gender} = ${activeFilters.gender} OR ${Products.gender} = 'U')`
+  );
+}
+if (activeFilters.activity) {
+  conditions.push(
+    sql`EXISTS (SELECT 1 FROM json_each(${Products.activity}) WHERE value = ${activeFilters.activity})`
+  );
+}
+if (activeFilters.brand) {
+  conditions.push(
+    sql`${Products.brandId} IN (SELECT id FROM "Brands" WHERE slug = ${activeFilters.brand})`
+  );
+}
+const where = and(...conditions);
+
+// Run data fetch + count in parallel
+const [allCollections, allBrands, rows, countRows] = await Promise.all([
+  db.select().from(Collections),
+  db.select().from(BrandsTable),
+  db.select()
+    .from(Products)
+    .leftJoin(Skus,     eq(Skus.id,     Products.defaultSkuId))
+    .leftJoin(Variants, eq(Variants.id, Skus.variantId))
+    .where(where)
+    .limit(PAGE_SIZE)
+    .offset((page - 1) * PAGE_SIZE),
+  db.select({ count: sql<number>`cast(count(*) as int)` })
+    .from(Products)
+    .where(where),
+]);
+
+const total      = countRows[0]?.count ?? 0;
+const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+
+const products: CatalogueProduct[] = rows.map(({ Products: prod, Skus: sku, Variants: variant }) => ({
+  id:            prod.id,
+  name:          prod.name,
+  slug:          prod.slug,
+  gender:        prod.gender ?? null,
+  brandId:       prod.brandId,
+  collectionIds: (prod.collectionIds as string[] | null) ?? [],
+  activity:      (prod.activity     as string[] | null) ?? [],
+  price:         sku?.price ?? 0,
+  imageId:       ((variant?.imageIds as string[] | null) ?? [])[0] ?? null,
+}));
+
+// Children of the active collection, or section roots when no collection is selected
+const subcollections = activeFilters.collection
+  ? allCollections.filter((c) => c.parentId === activeFilters.collection)
+  : allCollections.filter((c) => c.parentId === null);
+
+const currentCollection = activeFilters.collection
+  ? allCollections.find((c) => c.id === activeFilters.collection)
+  : null;
+
+// Walk up the tree to build the full breadcrumb path
+type Crumb = { label: string; href: string };
+const breadcrumb: Crumb[] = [];
+let node = currentCollection ?? null;
+while (node) {
+  breadcrumb.unshift({ label: node.label, href: `/catalogue?collection=${node.id}` });
+  node = node.parentId ? (allCollections.find((c) => c.id === node!.parentId) ?? null) : null;
+}
+
+const brandOptions: FilterOption[] = allBrands
+  .sort((a, b) => a.name.localeCompare(b.name))
+  .map((b) => ({ id: b.slug, label: b.name }));
+
+const pagination: PaginationInfo = { page, totalPages, total, pageSize: PAGE_SIZE };
+---
+
+<Layout title={currentCollection?.label ?? "Catalogo"}>
+  <CataloguePage
+    client:load
+    products={products}
+    subcollections={subcollections}
+    brandOptions={brandOptions}
+    activeFilters={activeFilters}
+    breadcrumb={breadcrumb}
+    pagination={pagination}
+  />
+</Layout>

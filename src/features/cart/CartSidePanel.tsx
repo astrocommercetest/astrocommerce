@@ -37,37 +37,37 @@ export default function CartSidepanel() {
               Your cart is empty
             </p>
           ) : (
-            entries.map(({ variant, qty }) => (
-              <div key={variant.id} className="flex gap-3 items-start">
+            entries.map(({ sku, variant, qty }) => (
+              <div key={sku.id} className="flex gap-3 items-start">
                 <img
                   src={cloudinaryImagePath(
                     "w_80,h_80,c_fill,q_auto,f_auto",
-                    variant.imageId,
+                    (variant.imageIds as string[] | null)?.[0],
                   )}
                   alt=""
                   className="w-20 h-20 object-cover"
                 />
                 <div className="flex-1 text-sm">
                   <p className="font-medium">
-                    {variant.color} — EU {variant.size}
+                    {variant.color} — EU {sku.size}
                   </p>
-                  <p className="text-gray-500">€{variant.price.toFixed(2)}</p>
+                  <p className="text-gray-500">€{sku.price.toFixed(2)}</p>
                   <div className="flex items-center gap-2 mt-1">
                     <button
-                      onClick={() => updateQty(variant.id, qty - 1)}
+                      onClick={() => updateQty(sku.id, qty - 1)}
                       className="w-6 h-6 border border-gray-400 rounded text-center"
                     >
                       −
                     </button>
                     <span>{qty}</span>
                     <button
-                      onClick={() => updateQty(variant.id, qty + 1)}
+                      onClick={() => updateQty(sku.id, qty + 1)}
                       className="w-6 h-6 border border-gray-400 rounded text-center"
                     >
                       +
                     </button>
                     <button
-                      onClick={() => removeFromCart(variant.id)}
+                      onClick={() => removeFromCart(sku.id)}
                       className="ml-2 text-xs text-red-500 hover:underline"
                     >
                       Remove

@@ -1,5 +1,5 @@
 ---
-import { db, eq, Products, Variants, Brands } from "astro:db";
+import { db, eq, Products, Variants, Skus, Brands } from "astro:db";
 import Layout from "../../layouts/Layout.astro";
 import Product from "../../features/product/ProductPage.tsx";
 
@@ -11,6 +11,7 @@ const rows = await db
   .select()
   .from(Products)
   .innerJoin(Variants, eq(Variants.productId, Products.id))
+  .innerJoin(Skus, eq(Skus.variantId, Variants.id))
   .leftJoin(Brands, eq(Brands.id, Products.brandId))
   .where(eq(Products.slug, slug));
 
@@ -18,9 +19,24 @@ if (!rows.length) return Astro.redirect("/404");
 
 const product = rows[0].Products;
 const brand = rows[0].Brands;
-const variants = rows.map((r) => r.Variants);
+
+// Group SKUs under their parent variant
+const variantsMap = new Map<string, typeof rows[0]["Variants"] & { skus: (typeof rows[0]["Skus"])[] }>();
+for (const row of rows) {
+  const v = row.Variants;
+  if (!variantsMap.has(v.id)) {
+    variantsMap.set(v.id, { ...v, skus: [] });
+  }
+  variantsMap.get(v.id)!.skus.push(row.Skus);
+}
+const variants = [...variantsMap.values()];
 ---
 
 <Layout title={product.name}>
-  <Product product={product} brand={brand} variants={variants} client:load />
+  <Product
+    product={product}
+    brand={brand}
+    variants={variants}
+    client:load
+  />
 </Layout>

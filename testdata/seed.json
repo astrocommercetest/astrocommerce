@@ -25,37 +25,61 @@
       "name": "Ribelle HD",
       "slug": "scarpa-ribelle-hd",
       "description": "Lo scarpone da alpinismo in pelle, leggero, confortevole e Made in Italy",
+      "longDescription": "<p>Il <strong>Ribelle HD</strong> è lo scarpone da alpinismo di punta di Scarpa: costruito in pelle pieno fiore italiana, combina rigidità tecnica e comfort da giornata lunga. La tomaia in pelle HD garantisce impermeabilità naturale e durata nel tempo, mentre la suola Vibram Mont.</p><ul><li>Tomaia in pelle pieno fiore HD</li><li>Fodera Cambrelle traspirante</li><li>Suola Vibram Mulaz</li><li>Compatibile con ramponi a innesto automatico</li></ul>",
       "brandId": "brand-1",
-      "collectionIds": ["attrezzatura", "scarponi", "scarponi-alpinismo"],
-      "variantIds": ["variant-1"],
+      "collectionIds": ["calzature", "scarponi"],
+      "gender": "U",
+      "activity": ["alpinismo"],
+      "defaultSkuId": "sku-1-42",
       "createdAt": "2024-01-01T00:00:00.000Z",
       "updatedAt": "2024-01-01T00:00:00.000Z",
-      "deletedAt": null,
-      "defaultVariantId": "variant-1"
+      "deletedAt": null
     },
     {
       "id": "product-2",
       "name": "Broad Peak IN Hooded Jacket Men",
       "slug": "mammut-broad-peak-in-hooded-jacket-men",
       "description": "Functional performance year-round down jacket",
+      "longDescription": "<p>The <strong>Broad Peak IN Hooded Jacket</strong> is Mammut's flagship insulation layer for alpine pursuits. Filled with 700-fill-power down and wrapped in a GORE-TEX shell, it handles everything from belays to summit pushes.</p><ul><li>700-fill-power responsible down</li><li>GORE-TEX outer shell</li><li>Helmet-compatible hood</li><li>Packable into its own chest pocket</li></ul>",
       "brandId": "brand-2",
       "collectionIds": ["abbigliamento", "giacche"],
-      "variantIds": ["variant-3", "variant-4"],
+      "gender": "M",
+      "activity": ["alpinismo", "scialpinismo"],
+      "defaultSkuId": "sku-3-48",
       "createdAt": "2024-01-01T00:00:00.000Z",
       "updatedAt": "2024-01-01T00:00:00.000Z",
-      "deletedAt": null,
-      "defaultVariantId": "variant-3"
+      "deletedAt": null
     }
+  ],
+  "collections": [
+    { "id": "abbigliamento",        "label": "Abbigliamento",            "section": "abbigliamento", "parentId": null,            "position": 1 },
+    { "id": "giacche",              "label": "Giacche",                  "section": "abbigliamento", "parentId": "abbigliamento", "position": 1 },
+    { "id": "pantaloni",            "label": "Pantaloni",                "section": "abbigliamento", "parentId": "abbigliamento", "position": 2 },
+    { "id": "maglie-felpe",         "label": "Maglie e felpe",           "section": "abbigliamento", "parentId": "abbigliamento", "position": 3 },
+    { "id": "softshell",            "label": "Softshell",                "section": "abbigliamento", "parentId": "giacche",       "position": 1 },
+    { "id": "calzature",             "label": "Scarpe",                   "section": "scarpe",        "parentId": null,            "position": 1 },
+    { "id": "scarpe",               "label": "Scarpe basse",             "section": "scarpe",        "parentId": "calzature",     "position": 1 },
+    { "id": "scarponi",             "label": "Scarponi",                 "section": "scarpe",        "parentId": "calzature",     "position": 2 },
+    { "id": "attrezzatura",         "label": "Attrezzatura",             "section": "attrezzatura",  "parentId": null,            "position": 1 },
+    { "id": "zaini",                "label": "Zaini",                    "section": "attrezzatura",  "parentId": "attrezzatura",  "position": 1 },
+    { "id": "piccozze",             "label": "Piccozze",                 "section": "attrezzatura",  "parentId": "attrezzatura",  "position": 2 },
+    { "id": "ramponi",              "label": "Ramponi",                  "section": "attrezzatura",  "parentId": "attrezzatura",  "position": 3 },
+    { "id": "imbragature",          "label": "Imbragature",              "section": "attrezzatura",  "parentId": "attrezzatura",  "position": 4 },
+    { "id": "corde",                "label": "Corde",                    "section": "attrezzatura",  "parentId": "attrezzatura",  "position": 5 },
+    { "id": "bastoncini",           "label": "Bastoncini",               "section": "attrezzatura",  "parentId": "attrezzatura",  "position": 6 },
+    { "id": "accessori",            "label": "Accessori",                "section": "accessori",     "parentId": null,            "position": 1 },
+    { "id": "guanti",               "label": "Guanti",                   "section": "accessori",     "parentId": "accessori",     "position": 1 },
+    { "id": "calze",                "label": "Calze",                    "section": "accessori",     "parentId": "accessori",     "position": 2 },
+    { "id": "cappelli",             "label": "Cappelli e berretti",      "section": "accessori",     "parentId": "accessori",     "position": 3 },
+    { "id": "occhiali",             "label": "Occhiali da sole",         "section": "accessori",     "parentId": "accessori",     "position": 4 },
+    { "id": "scaldacollo",          "label": "Scaldacollo e buff",       "section": "accessori",     "parentId": "accessori",     "position": 5 }
   ],
   "variants": [
     {
       "id": "variant-1",
       "productId": "product-1",
-      "imageId": "",
-      "price": 369.99,
-      "stockQty": 2,
-      "size": 42,
       "color": "Arancione",
+      "imageIds": [],
       "createdAt": "2024-01-01T00:00:00.000Z",
       "updatedAt": "2024-01-01T00:00:00.000Z",
       "deletedAt": null
@@ -63,11 +87,8 @@
     {
       "id": "variant-2",
       "productId": "product-1",
-      "imageId": "",
-      "price": 369.99,
-      "stockQty": 2,
-      "size": 43,
       "color": "Nero",
+      "imageIds": [],
       "createdAt": "2024-01-01T00:00:00.000Z",
       "updatedAt": "2024-01-01T00:00:00.000Z",
       "deletedAt": null
@@ -75,11 +96,8 @@
     {
       "id": "variant-3",
       "productId": "product-2",
-      "imageId": "",
-      "price": 299.99,
-      "stockQty": 5,
-      "size": "M",
       "color": "Red",
+      "imageIds": [],
       "createdAt": "2024-01-01T00:00:00.000Z",
       "updatedAt": "2024-01-01T00:00:00.000Z",
       "deletedAt": null
@@ -87,11 +105,110 @@
     {
       "id": "variant-4",
       "productId": "product-2",
-      "imageId": "",
+      "color": "Black",
+      "imageIds": [],
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z",
+      "deletedAt": null
+    }
+  ],
+  "skus": [
+    {
+      "id": "sku-1-42",
+      "variantId": "variant-1",
+      "size": 42,
+      "price": 369.99,
+      "stockQty": 2,
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z",
+      "deletedAt": null
+    },
+    {
+      "id": "sku-1-43",
+      "variantId": "variant-1",
+      "size": 43,
+      "price": 369.99,
+      "stockQty": 1,
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z",
+      "deletedAt": null
+    },
+    {
+      "id": "sku-1-44",
+      "variantId": "variant-1",
+      "size": 44,
+      "price": 369.99,
+      "stockQty": 0,
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z",
+      "deletedAt": null
+    },
+    {
+      "id": "sku-2-42",
+      "variantId": "variant-2",
+      "size": 42,
+      "price": 369.99,
+      "stockQty": 0,
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z",
+      "deletedAt": null
+    },
+    {
+      "id": "sku-2-43",
+      "variantId": "variant-2",
+      "size": 43,
+      "price": 379.99,
+      "stockQty": 3,
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z",
+      "deletedAt": null
+    },
+    {
+      "id": "sku-2-44",
+      "variantId": "variant-2",
+      "size": 44,
+      "price": 379.99,
+      "stockQty": 4,
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z",
+      "deletedAt": null
+    },
+    {
+      "id": "sku-3-48",
+      "variantId": "variant-3",
+      "size": 48,
+      "price": 299.99,
+      "stockQty": 5,
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z",
+      "deletedAt": null
+    },
+    {
+      "id": "sku-3-50",
+      "variantId": "variant-3",
+      "size": 50,
+      "price": 299.99,
+      "stockQty": 2,
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z",
+      "deletedAt": null
+    },
+    {
+      "id": "sku-4-48",
+      "variantId": "variant-4",
+      "size": 48,
       "price": 320.99,
       "stockQty": 1,
-      "size": "L",
-      "color": "Black",
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z",
+      "deletedAt": null
+    },
+    {
+      "id": "sku-4-50",
+      "variantId": "variant-4",
+      "size": 50,
+      "price": 320.99,
+      "stockQty": 0,
       "createdAt": "2024-01-01T00:00:00.000Z",
       "updatedAt": "2024-01-01T00:00:00.000Z",
       "deletedAt": null

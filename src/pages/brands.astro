@@ -1,0 +1,42 @@
+---
+import { db, Brands as BrandsTable } from "astro:db";
+import Layout from "../layouts/Layout.astro";
+
+type Brand = typeof BrandsTable.$inferSelect;
+
+const brands: Brand[] = (await db.select().from(BrandsTable)).sort((a, b) =>
+  a.name.localeCompare(b.name, "it"),
+);
+
+// Group by first letter
+const grouped = brands.reduce<Record<string, Brand[]>>((acc, brand) => {
+  const letter = brand.name[0].toUpperCase();
+  (acc[letter] ??= []).push(brand);
+  return acc;
+}, {});
+
+const letters = Object.keys(grouped).sort();
+---
+
+<Layout title="Marchi">
+  <h1 class="text-3xl font-extrabold mb-10">Marchi</h1>
+  <div class="flex flex-col gap-8">
+    {letters.map((letter) => (
+      <section>
+        <p class="text-xs font-semibold uppercase tracking-wide text-gray-400 mb-2">{letter}</p>
+        <ul class="flex flex-col gap-1">
+          {grouped[letter].map((brand) => (
+            <li>
+              <a
+                href={`/catalogue?brand=${brand.slug}`}
+                class="text-sm text-gray-700 hover:text-gray-900 hover:underline"
+              >
+                {brand.name}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </section>
+    ))}
+  </div>
+</Layout>

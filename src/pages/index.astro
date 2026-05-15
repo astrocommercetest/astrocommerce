@@ -1,17 +1,18 @@
 ---
 import { cloudinaryImagePath } from "../lib/cloudinary";
-import { db, eq, Products, Variants } from "astro:db";
+import { db, eq, Products, Variants, Skus } from "astro:db";
 import Layout from "../layouts/Layout.astro";
 
 const rows = await db
   .select()
   .from(Products)
-  .leftJoin(Variants, eq(Variants.id, Products.defaultVariantId));
+  .leftJoin(Skus, eq(Skus.id, Products.defaultSkuId))
+  .leftJoin(Variants, eq(Variants.id, Skus.variantId));
 
-const list = rows.map(({ Products: p, Variants: v }) => ({
+const list = rows.map(({ Products: p, Skus: s, Variants: v }) => ({
   ...p,
-  variant: v,
-  variantCount: Array.isArray(p.variantIds) ? p.variantIds.length : 0,
+  imageId: (v?.imageIds as string[] | null)?.[0],
+  price: s?.price ?? null,
   href: `/products/${p.slug}`,
 }));
 ---
@@ -25,18 +26,15 @@ const list = rows.map(({ Products: p, Variants: v }) => ({
             <img
               src={cloudinaryImagePath(
                 "w_400,h_400,c_thumb,q_auto,f_auto",
-                p.variant?.imageId,
+                p.imageId,
               )}
               alt={p.name}
               class="object-cover"
             />
             <div class="mt-2">
               <p class="font-medium truncate">{p.name}</p>
-              <p class="text-sm text-gray-500">
-                ${p.variant?.price.toFixed(2)}
-              </p>
-              {p.variantCount > 1 && (
-                <p class="text-xs text-gray-400">{p.variantCount} variants</p>
+              {p.price != null && (
+                <p class="text-sm text-gray-500">€{p.price.toFixed(2)}</p>
               )}
             </div>
           </a>
