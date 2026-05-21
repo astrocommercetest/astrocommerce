@@ -42,7 +42,7 @@ function UserMenu() {
           <DropdownMenuSeparator />
           <DropdownMenuItem
             className="text-red-600 focus:text-red-600"
-            onSelect={() =>
+            onClick={() =>
               authClient.signOut({ fetchOptions: { onSuccess: () => { window.location.href = "/"; } } })
             }
           >
