@@ -63,8 +63,8 @@ function StripePaymentForm({ userId, email, itemsPayload, shippingPayload, onBac
       });
       const data = await res.json();
       if (!res.ok) { setError(data.error ?? "Errore durante la conferma."); setLoading(false); return; }
-      clearCart();
       window.location.href = `/ordine/${data.orderId}`;
+      clearCart();
     }
   }
 
