@@ -85,7 +85,15 @@ export default function CartSidepanel() {
               <span>Total!</span>
               <span>€{total.toFixed(2)}</span>
             </div>
-            <button className="button w-full">Checkout</button>
+            <button
+              className="button w-full"
+              onClick={() => {
+                isCartOpen.set(false);
+                window.location.href = "/checkout";
+              }}
+            >
+              Procedi all&apos;ordine
+            </button>
           </div>
         )}
       </div>

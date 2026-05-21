@@ -10,6 +10,7 @@ const ProductsTable = defineTable({
     gender: column.text({ optional: true }), // 'M' | 'W' | 'U'
     brandId: column.text({ references: () => BrandsTable.columns.id }),
     defaultSkuId: column.text(), // no FK to avoid circular dependency
+    published: column.boolean(),
     collectionIds: column.json({ optional: true }),
     activity: column.json({ optional: true }), // string[] e.g. ["alpinismo", "trekking"]
     createdAt: column.date(),
@@ -81,6 +82,11 @@ const UserTable = defineTable({
     emailVerified: column.boolean(),
     image: column.text({ optional: true }),
     role: column.text({ optional: true }),
+    shippingAddress: column.text({ optional: true }),
+    shippingCity: column.text({ optional: true }),
+    shippingZip: column.text({ optional: true }),
+    shippingProvince: column.text({ optional: true }),
+    shippingPhone: column.text({ optional: true }),
     createdAt: column.date(),
     updatedAt: column.date(),
   },
@@ -128,6 +134,29 @@ const VerificationTable = defineTable({
   },
 });
 
+const OrdersTable = defineTable({
+  columns: {
+    id: column.text({ primaryKey: true }),
+    userId: column.text({ optional: true }),
+    guestEmail: column.text({ optional: true }),
+    status: column.text(),
+    subtotal: column.number(),
+    items: column.json(),
+    shippingName: column.text(),
+    shippingAddress: column.text(),
+    shippingCity: column.text(),
+    shippingZip: column.text(),
+    shippingProvince: column.text(),
+    shippingPhone: column.text(),
+    notes: column.text({ optional: true }),
+    paymentRef: column.text({ optional: true }),
+    paidAt: column.date({ optional: true }),
+    createdAt: column.date(),
+    updatedAt: column.date(),
+  },
+  indexes: [{ on: ["userId"] }, { on: ["createdAt"] }],
+});
+
 export default defineDb({
   tables: {
     Products: ProductsTable,
@@ -139,5 +168,6 @@ export default defineDb({
     Session: SessionTable,
     Account: AccountTable,
     Verification: VerificationTable,
+    Orders: OrdersTable,
   },
 });

@@ -39,19 +39,27 @@ export default function CataloguePage({
     ...activeFilters,
   });
 
-  const toggle = (key: keyof ActiveFilters, value: string) =>
-    setPending((prev) => ({
-      ...prev,
-      [key]: prev[key] === value ? null : value,
-    }));
+  const toggle = (key: "gender" | "activity" | "brand", value: string) =>
+    setPending((prev) => {
+      const current = prev[key];
+      return {
+        ...prev,
+        [key]: current.includes(value)
+          ? current.filter((v) => v !== value)
+          : [...current, value],
+      };
+    });
+
+  const arraysEqual = (a: string[], b: string[]) =>
+    [...a].sort().join() === [...b].sort().join();
 
   const isDirty =
-    pending.gender !== activeFilters.gender ||
-    pending.activity !== activeFilters.activity ||
-    pending.brand !== activeFilters.brand;
+    !arraysEqual(pending.gender, activeFilters.gender) ||
+    !arraysEqual(pending.activity, activeFilters.activity) ||
+    !arraysEqual(pending.brand, activeFilters.brand);
 
   return (
-    <div>
+    <div className="w-full">
       <h1 className="text-2xl font-bold mb-8">
         {breadcrumb[breadcrumb.length - 1]?.label ?? "Catalogo"}
       </h1>
@@ -90,20 +98,20 @@ export default function CataloguePage({
           <FilterSection
             title="Genere"
             options={GENDERS}
-            activeId={pending.gender}
+            activeIds={pending.gender}
             onToggle={(id) => toggle("gender", id)}
           />
           <FilterSection
             title="Attività"
             options={ACTIVITIES}
-            activeId={pending.activity}
+            activeIds={pending.activity}
             onToggle={(id) => toggle("activity", id)}
           />
           {brandOptions.length > 0 && (
             <FilterSection
               title="Marchio"
               options={brandOptions}
-              activeId={pending.brand}
+              activeIds={pending.brand}
               onToggle={(id) => toggle("brand", id)}
             />
           )}
@@ -118,15 +126,15 @@ export default function CataloguePage({
             Applica filtri
           </a>
 
-          {(activeFilters.gender ||
-            activeFilters.activity ||
-            activeFilters.brand) && (
+          {(activeFilters.gender.length > 0 ||
+            activeFilters.activity.length > 0 ||
+            activeFilters.brand.length > 0) && (
             <a
               href={buildUrl({
                 ...activeFilters,
-                gender: null,
-                activity: null,
-                brand: null,
+                gender: [],
+                activity: [],
+                brand: [],
               })}
               className="text-xs text-center text-gray-400 hover:text-gray-700 underline"
             >
@@ -208,12 +216,12 @@ export default function CataloguePage({
 function FilterSection({
   title,
   options,
-  activeId,
+  activeIds,
   onToggle,
 }: {
   title: string;
   options: FilterOption[];
-  activeId: string | null;
+  activeIds: string[];
   onToggle: (id: string) => void;
 }) {
   return (
@@ -227,7 +235,7 @@ function FilterSection({
           >
             <input
               type="checkbox"
-              checked={activeId === opt.id}
+              checked={activeIds.includes(opt.id)}
               onChange={() => onToggle(opt.id)}
               className="w-4 h-4 rounded border-gray-300 text-gray-900 cursor-pointer accent-gray-900"
             />
@@ -244,9 +252,9 @@ function FilterSection({
 function buildUrl(filters: ActiveFilters, page?: number): string {
   const params = new URLSearchParams();
   if (filters.collection) params.set("collection", filters.collection);
-  if (filters.gender) params.set("gender", filters.gender);
-  if (filters.activity) params.set("activity", filters.activity);
-  if (filters.brand) params.set("brand", filters.brand);
+  filters.gender.forEach((g) => params.append("gender", g));
+  filters.activity.forEach((a) => params.append("activity", a));
+  filters.brand.forEach((b) => params.append("brand", b));
   if (page && page > 1) params.set("page", String(page));
   const qs = params.toString();
   return qs ? `/catalogue?${qs}` : "/catalogue";

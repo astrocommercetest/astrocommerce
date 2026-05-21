@@ -14,6 +14,11 @@ export const auth = betterAuth({
         required: false,
         input: false,
       },
+      shippingAddress: { type: "string", required: false, input: false },
+      shippingCity: { type: "string", required: false, input: false },
+      shippingZip: { type: "string", required: false, input: false },
+      shippingProvince: { type: "string", required: false, input: false },
+      shippingPhone: { type: "string", required: false, input: false },
     },
   },
   database: drizzleAdapter(db, {
@@ -28,11 +33,17 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
     requireEmailVerification: true,
+    sendResetPassword: async ({ user, url }) => {
+      void sendEmail({
+        to: user.email,
+        subject: "Reimposta la tua password",
+        text: `Clicca il link per reimpostare la password:\n${url}\n\nIl link scade tra 1 ora.`,
+      });
+    },
   },
   emailVerification: {
     autoSignInAfterVerification: true,
     sendVerificationEmail: async ({ user, url }) => {
-      console.log(`[auth] verification link for ${user.email}: ${url}`);
       void sendEmail({
         to: user.email,
         subject: "Verifica il tuo indirizzo email",

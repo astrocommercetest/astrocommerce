@@ -9,12 +9,14 @@ const rows = await db
   .leftJoin(Skus, eq(Skus.id, Products.defaultSkuId))
   .leftJoin(Variants, eq(Variants.id, Skus.variantId));
 
-const list = rows.map(({ Products: p, Skus: s, Variants: v }) => ({
-  ...p,
-  imageId: (v?.imageIds as string[] | null)?.[0],
-  price: s?.price ?? null,
-  href: `/products/${p.slug}`,
-}));
+const list = rows
+  .filter(({ Products: p }) => p.published !== false && !p.deletedAt)
+  .map(({ Products: p, Skus: s, Variants: v }) => ({
+    ...p,
+    imageId: (v?.imageIds as string[] | null)?.[0],
+    price: s?.price ?? null,
+    href: `/products/${p.slug}`,
+  }));
 ---
 
 <Layout title="Products">

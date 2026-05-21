@@ -15,14 +15,14 @@ const rows = await db
   .leftJoin(Brands, eq(Brands.id, Products.brandId))
   .where(eq(Products.slug, slug));
 
-if (!rows.length) return Astro.redirect("/404");
-
-const product = rows[0].Products;
-const brand = rows[0].Brands;
+const publishedRows = rows.filter(({ Products: p }) => p.published !== false && !p.deletedAt);
+if (!publishedRows.length) return Astro.redirect("/404");
+const product = publishedRows[0].Products;
+const brand = publishedRows[0].Brands;
 
 // Group SKUs under their parent variant
-const variantsMap = new Map<string, typeof rows[0]["Variants"] & { skus: (typeof rows[0]["Skus"])[] }>();
-for (const row of rows) {
+const variantsMap = new Map<string, typeof publishedRows[0]["Variants"] & { skus: (typeof publishedRows[0]["Skus"])[] }>();
+for (const row of publishedRows) {
   const v = row.Variants;
   if (!variantsMap.has(v.id)) {
     variantsMap.set(v.id, { ...v, skus: [] });

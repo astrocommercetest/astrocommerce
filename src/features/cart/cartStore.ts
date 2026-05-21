@@ -57,3 +57,7 @@ export function updateQty(skuId: string, qty: number) {
     if (existing) cartItems.setKey(skuId, { ...existing, qty });
   }
 }
+
+export function clearCart() {
+  cartItems.set({});
+}

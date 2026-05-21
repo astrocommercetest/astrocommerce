@@ -1,5 +1,5 @@
 ---
-import { db, eq, and, sql, Products, Skus, Variants, Collections, Brands as BrandsTable } from "astro:db";
+import { db, eq, and, or, sql, Products, Skus, Variants, Collections, Brands as BrandsTable } from "astro:db";
 import Layout from "../layouts/Layout.astro";
 import CataloguePage from "../features/catalogue/CataloguePage.tsx";
 import type { CatalogueProduct, ActiveFilters, FilterOption, PaginationInfo } from "../features/catalogue/types";
@@ -7,9 +7,9 @@ import type { CatalogueProduct, ActiveFilters, FilterOption, PaginationInfo } fr
 const p = Astro.url.searchParams;
 const activeFilters: ActiveFilters = {
   collection: p.get("collection"),
-  gender:     p.get("gender"),
-  activity:   p.get("activity"),
-  brand:      p.get("brand"),
+  gender:     p.getAll("gender"),
+  activity:   p.getAll("activity"),
+  brand:      p.getAll("brand"),
 };
 const page     = Math.max(1, parseInt(p.get("page") ?? "1"));
 const PAGE_SIZE = 24;
@@ -21,19 +21,25 @@ if (activeFilters.collection) {
     sql`EXISTS (SELECT 1 FROM json_each(${Products.collectionIds}) WHERE value = ${activeFilters.collection})`
   );
 }
-if (activeFilters.gender) {
+if (activeFilters.gender.length > 0) {
   conditions.push(
-    sql`(${Products.gender} = ${activeFilters.gender} OR ${Products.gender} = 'U')`
+    or(...activeFilters.gender.map((g) =>
+      sql`(${Products.gender} = ${g} OR ${Products.gender} = 'U')`
+    ))!
   );
 }
-if (activeFilters.activity) {
+if (activeFilters.activity.length > 0) {
   conditions.push(
-    sql`EXISTS (SELECT 1 FROM json_each(${Products.activity}) WHERE value = ${activeFilters.activity})`
+    or(...activeFilters.activity.map((a) =>
+      sql`EXISTS (SELECT 1 FROM json_each(${Products.activity}) WHERE value = ${a})`
+    ))!
   );
 }
-if (activeFilters.brand) {
+if (activeFilters.brand.length > 0) {
   conditions.push(
-    sql`${Products.brandId} IN (SELECT id FROM "Brands" WHERE slug = ${activeFilters.brand})`
+    or(...activeFilters.brand.map((b) =>
+      sql`${Products.brandId} IN (SELECT id FROM "Brands" WHERE slug = ${b})`
+    ))!
   );
 }
 const where = and(...conditions);

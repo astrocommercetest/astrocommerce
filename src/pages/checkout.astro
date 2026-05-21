@@ -1,0 +1,26 @@
+---
+import Layout from "../layouts/Layout.astro";
+import CheckoutForm from "../features/checkout/CheckoutForm";
+
+const user = Astro.locals.user;
+---
+
+<Layout title="Checkout">
+  <div class="max-w-6xl mx-auto p-16 border border-gray-300">
+    <CheckoutForm
+      client:only="react"
+      userId={user?.id ?? null}
+      initialName={user?.name ?? ""}
+      initialEmail={user?.email ?? ""}
+      savedShipping={user
+        ? {
+            address: user.shippingAddress ?? "",
+            city: user.shippingCity ?? "",
+            zip: user.shippingZip ?? "",
+            province: user.shippingProvince ?? "",
+            phone: user.shippingPhone ?? "",
+          }
+        : null}
+    />
+  </div>
+</Layout>

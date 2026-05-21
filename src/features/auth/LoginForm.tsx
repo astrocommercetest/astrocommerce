@@ -2,7 +2,11 @@ import { useState } from "react";
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
 import { authClient } from "@/lib/auth-client";
 
-export default function LoginForm() {
+export default function LoginForm({
+  redirectTo = "/",
+}: {
+  redirectTo?: string;
+}) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -23,16 +27,16 @@ export default function LoginForm() {
             setError(ctx.error.message ?? "Errore durante l'accesso.");
           }
         },
-      }
+      },
     );
     setLoading(false);
     if (!error) {
-      window.location.href = "/";
+      window.location.href = redirectTo;
     }
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-4 max-w-sm">
+    <form onSubmit={handleSubmit} className="flex flex-col gap-4  w-full">
       <div className="flex flex-col gap-1">
         <label htmlFor="email" className="text-sm font-medium">
           Email
@@ -72,6 +76,9 @@ export default function LoginForm() {
             )}
           </button>
         </div>
+        <a href="/forgot-password" className="text-xs text-gray-500 underline mt-1 self-end">
+          Password dimenticata?
+        </a>
       </div>
       {error && <p className="text-sm text-red-600">{error}</p>}
       <button type="submit" disabled={loading} className="button">

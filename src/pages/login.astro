@@ -3,11 +3,14 @@ import Layout from "../layouts/Layout.astro";
 import LoginForm from "../features/auth/LoginForm";
 
 if (Astro.locals.user) {
-  return Astro.redirect("/");
+  return Astro.redirect(Astro.url.searchParams.get("redirect") ?? "/");
 }
+const redirectTo = Astro.url.searchParams.get("redirect") ?? "/";
 ---
 
 <Layout title="Accedi">
-  <h1 class="text-2xl font-bold mb-6">Accedi</h1>
-  <LoginForm client:load />
+  <div class="max-w-lg mx-auto p-16 border border-gray-300">
+    <h1 class="text-2xl font-bold mb-6">Accedi</h1>
+    <LoginForm client:load redirectTo={redirectTo} />
+  </div>
 </Layout>

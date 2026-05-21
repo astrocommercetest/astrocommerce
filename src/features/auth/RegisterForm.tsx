@@ -10,7 +10,7 @@ const strengthConfig = [
   { label: "Ottima", color: "bg-green-500" },
 ];
 
-export default function RegisterForm() {
+export default function RegisterForm({ redirectTo = "/" }: { redirectTo?: string }) {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
@@ -22,7 +22,9 @@ export default function RegisterForm() {
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const strength = password ? strengthConfig[passwordStrength(password).id] : null;
+  const strength = password
+    ? strengthConfig[passwordStrength(password).id]
+    : null;
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -33,13 +35,18 @@ export default function RegisterForm() {
     setError(null);
     setLoading(true);
     await authClient.signUp.email(
-      { name: `${firstName} ${lastName}`.trim(), email, password },
+      {
+        name: `${firstName} ${lastName}`.trim(),
+        email,
+        password,
+        callbackURL: redirectTo,
+      },
       {
         onSuccess: () => setSuccess(true),
         onError: (ctx) => {
           setError(ctx.error.message ?? "Errore durante la registrazione.");
         },
-      }
+      },
     );
     setLoading(false);
   }
@@ -49,14 +56,15 @@ export default function RegisterForm() {
       <div className="max-w-sm">
         <p className="text-sm">
           Registrazione avvenuta. Controlla la tua email e clicca il link di
-          verifica per attivare l&apos;account.
+          verifica per attivare l&apos;account
+          {redirectTo !== "/" && " e completare il tuo ordine"}.
         </p>
       </div>
     );
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-4 max-w-sm">
+    <form onSubmit={handleSubmit} className="flex flex-col gap-4 w-full">
       <div className="flex gap-3">
         <div className="flex flex-col gap-1 flex-1">
           <label htmlFor="firstName" className="text-sm font-medium">
@@ -133,7 +141,9 @@ export default function RegisterForm() {
                 <div
                   key={i}
                   className={`h-1 flex-1 rounded-full transition-colors ${
-                    i <= strengthConfig.indexOf(strength) ? strength.color : "bg-gray-200"
+                    i <= strengthConfig.indexOf(strength)
+                      ? strength.color
+                      : "bg-gray-200"
                   }`}
                 />
               ))}
@@ -181,7 +191,11 @@ export default function RegisterForm() {
             Privacy Policy
           </a>{" "}
           e le{" "}
-          <a href="/condizioni-di-utilizzo" target="_blank" className="underline">
+          <a
+            href="/condizioni-di-utilizzo"
+            target="_blank"
+            className="underline"
+          >
             Condizioni di utilizzo
           </a>
         </span>
@@ -193,7 +207,7 @@ export default function RegisterForm() {
       </button>
       <p className="text-sm text-center">
         Hai già un account?{" "}
-        <a href="/login" className="underline">
+        <a href={`/login?redirect=${encodeURIComponent(redirectTo)}`} className="underline">
           Accedi
         </a>
       </p>

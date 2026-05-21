@@ -1,0 +1,78 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import { db, Orders, eq } from "astro:db";
+
+const { id } = Astro.params;
+if (!id) return Astro.redirect("/");
+
+const [order] = await db.select().from(Orders).where(eq(Orders.id, id));
+if (!order) return Astro.redirect("/");
+
+type OrderItem = {
+  skuId: string;
+  variantId: string;
+  productName: string;
+  color: string | null;
+  size: number | null;
+  unitPrice: number;
+  qty: number;
+};
+
+const items = order.items as OrderItem[];
+const shortId = id.slice(0, 8).toUpperCase();
+---
+
+<Layout title={`Ordine #${shortId}`}>
+  <div class="max-w-2xl">
+    <div class="mb-8">
+      <p class="text-sm text-green-600 font-medium mb-1">Ordine confermato</p>
+      <h1 class="text-2xl font-bold">Grazie per il tuo acquisto!</h1>
+      <p class="text-sm text-gray-500 mt-1">Ordine #{shortId}</p>
+    </div>
+
+    <div class="grid md:grid-cols-2 gap-8">
+      <div>
+        <h2 class="font-semibold mb-3">Articoli ordinati</h2>
+        <div class="flex flex-col gap-3">
+          {
+            items.map((item) => (
+              <div class="flex justify-between text-sm">
+                <div>
+                  <p class="font-medium">{item.productName}</p>
+                  <p class="text-gray-500">
+                    {item.color ? `${item.color} — ` : ""}
+                    {item.size ? `EU ${item.size} — ` : ""}
+                    qty {item.qty}
+                  </p>
+                </div>
+                <p class="font-medium">
+                  €{(item.unitPrice * item.qty).toFixed(2)}
+                </p>
+              </div>
+            ))
+          }
+        </div>
+        <div
+          class="mt-4 pt-4 border-t border-gray-200 flex justify-between font-semibold text-sm"
+        >
+          <span>Totale</span>
+          <span>€{order.subtotal.toFixed(2)}</span>
+        </div>
+      </div>
+
+      <div>
+        <h2 class="font-semibold mb-3">Spedizione a</h2>
+        <address class="text-sm not-italic text-gray-700 leading-6">
+          {order.shippingName}<br />
+          {order.shippingAddress}<br />
+          {order.shippingZip} {order.shippingCity} ({order.shippingProvince})<br
+          />
+          {order.shippingPhone}
+          {order.notes && <><br /><span class="text-gray-500">Note: {order.notes}</span></>}
+        </address>
+      </div>
+    </div>
+
+    <a href="/" class="button inline-block mt-8">Continua lo shopping</a>
+  </div>
+</Layout>

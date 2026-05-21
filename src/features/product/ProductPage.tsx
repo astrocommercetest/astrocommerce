@@ -58,7 +58,7 @@ export default function Product({ product, variants, brand }: Props) {
   };
 
   return (
-    <div className="flex flex-col md:flex-row gap-16">
+    <div className="flex flex-col md:flex-row gap-16 max-w-290 mx-auto">
       <article className="order-2">
         <header>
           <h1 className="text-4xl font-extrabold">{product.name}</h1>

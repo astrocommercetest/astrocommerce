@@ -1,0 +1,25 @@
+---
+import "../styles/global.css";
+import { Font } from "astro:assets";
+import AdminApp from "../features/admin/AdminApp";
+
+const user = Astro.locals.user as { role?: string } | null;
+
+if (!user || user.role !== "admin") {
+  return Astro.redirect("/login?redirect=/admin");
+}
+---
+
+<!doctype html>
+<html lang="it" class="h-full">
+  <head>
+    <Font cssVariable="--font-roboto" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>Admin — AstroCommerce</title>
+  </head>
+  <body class="h-full bg-background text-foreground antialiased">
+    <AdminApp client:only="react" />
+  </body>
+</html>

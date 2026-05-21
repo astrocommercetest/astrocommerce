@@ -6,6 +6,7 @@ import Navigation from "../features/navigation/Navigation.tsx";
 import { buildMenu } from "../features/navigation/buildMenu";
 import CartSidePanel from "../features/cart/CartSidePanel.tsx";
 import Toaster from "../features/toasts/Toaster";
+import Footer from "../features/navigation/Footer.astro";
 
 interface LayoutProps {
   title?: string;
@@ -38,10 +39,15 @@ const pageTitle = `${title ?? baseTitle} - ${slogan ?? baseSlogan}`;
     <title>{pageTitle}</title>
   </head>
   <body>
-    <Navigation items={menuItems} siteTitle={baseTitle} client:load />
-    <main class="max-w-4xl mx-auto px-6 mt-8 md:mt-16">
-      <slot />
-    </main>
+    <div class="min-h-screen flex flex-col">
+      <Navigation items={menuItems} siteTitle={baseTitle} client:load />
+      <main class="px-6 mt-8 flex-1">
+        <slot />
+      </main>
+      <footer class="mt-8">
+        <Footer />
+      </footer>
+    </div>
     <CartSidePanel client:only="react" />
     <Toaster client:only="react" />
   </body>

@@ -1,5 +1,6 @@
 import { db, Brands, Products, Variants, Skus, Collections, User, Session, Account, Verification, eq } from "astro:db";
-import { auth } from "../src/features/auth/auth";
+import { hashPassword } from "better-auth/crypto";
+import { randomUUID } from "node:crypto";
 import { readFileSync, readdirSync, existsSync, writeFileSync } from "node:fs";
 import { createHash } from "node:crypto";
 import { resolve } from "node:path";
@@ -48,6 +49,7 @@ async function syncImages(variants: any[]): Promise<void> {
   const cloudName = import.meta.env.PUBLIC_CLOUDINARY_CLOUD_NAME;
   const apiKey = import.meta.env.CLOUDINARY_API_KEY;
   const apiSecret = import.meta.env.CLOUDINARY_API_SECRET;
+  const folder = import.meta.env.CLOUDINARY_FOLDER ?? "dev";
 
   if (!cloudName || !apiKey || !apiSecret) {
     console.warn(
@@ -99,6 +101,7 @@ async function syncImages(variants: any[]): Promise<void> {
       try {
         const result = await cloudinary.uploader.upload(filePath, {
           public_id: publicId,
+          folder,
           overwrite: true,
           resource_type: "image",
         });
@@ -157,26 +160,35 @@ export default async function seed() {
   await db.delete(User);
 
   await db.insert(Brands).values(brands.map(toRow));
-  await db.insert(Products).values(products.map(toRow));
+  await db.insert(Products).values(products.map((p: any) => ({ ...toRow(p), published: true })));
   await db.insert(Variants).values(variants.map(toRow));
   await db.insert(Skus).values(skus.map(toRow));
   // Collections are self-referential — insert parents before children
   await db.insert(Collections).values(collections);
 
-  await auth.api.signUpEmail({
-    body: {
-      name: "Matteo Leoni",
-      email: "leoni.matteo@gmail.com",
-      password: "astrocommerce",
-    },
+  const userId = randomUUID();
+  const now = new Date();
+  await db.insert(User).values({
+    id: userId,
+    name: "Matteo Leoni",
+    email: "leoni.matteo@gmail.com",
+    emailVerified: true,
+    role: "admin",
+    createdAt: now,
+    updatedAt: now,
   });
-  await db
-    .update(User)
-    .set({ emailVerified: true, role: "admin" })
-    .where(eq(User.email, "leoni.matteo@gmail.com"));
+  await db.insert(Account).values({
+    id: randomUUID(),
+    userId,
+    accountId: userId,
+    providerId: "credential",
+    password: await hashPassword("admin"),
+    createdAt: now,
+    updatedAt: now,
+  });
 
   console.log(
     `[seed] done: ${brands.length} brands, ${products.length} products, ${variants.length} variants, ${skus.length} skus, ${collections.length} collections`,
   );
-  console.log("[seed] admin user: leoni.matteo@gmail.com / astrocommerce");
+  console.log("[seed] admin user: leoni.matteo@gmail.com / admin");
 }

@@ -12,9 +12,9 @@ export type CatalogueProduct = {
 
 export type ActiveFilters = {
   collection: string | null;
-  gender: string | null;
-  activity: string | null;
-  brand: string | null;
+  gender: string[];
+  activity: string[];
+  brand: string[];
 };
 
 export type FilterOption = {

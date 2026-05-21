@@ -1,4 +1,7 @@
 import { auth } from "@/auth";
 import type { APIRoute } from "astro";
 
-export const ALL: APIRoute = async (ctx) => auth.handler(ctx.request);
+const handler: APIRoute = async (ctx) => auth.handler(ctx.request);
+
+export const GET = handler;
+export const POST = handler;
