@@ -6,7 +6,7 @@ import type {
   FilterOption,
   PaginationInfo,
 } from "./types";
-import { ACTIVITIES, GENDERS } from "./types";
+import { GENDERS } from "./types";
 
 type Collection = {
   id: string;
@@ -22,6 +22,7 @@ interface Props {
   products: CatalogueProduct[];
   subcollections: Collection[];
   brandOptions: FilterOption[];
+  activityOptions: FilterOption[];
   activeFilters: ActiveFilters;
   breadcrumb: Crumb[];
   pagination: PaginationInfo;
@@ -31,6 +32,7 @@ export default function CataloguePage({
   products,
   subcollections,
   brandOptions,
+  activityOptions,
   activeFilters,
   breadcrumb,
   pagination,
@@ -103,7 +105,7 @@ export default function CataloguePage({
           />
           <FilterSection
             title="Attività"
-            options={ACTIVITIES}
+            options={activityOptions}
             activeIds={pending.activity}
             onToggle={(id) => toggle("activity", id)}
           />

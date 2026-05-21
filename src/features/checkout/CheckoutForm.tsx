@@ -2,7 +2,7 @@ import { useRef, useState } from "react";
 import { useStore } from "@nanostores/react";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements, PaymentElement, useStripe, useElements } from "@stripe/react-stripe-js";
-import { cartItems, cartTotal, clearCart } from "@/features/cart/cartStore";
+import { cartItems, cartTotal } from "@/features/cart/cartStore";
 import { cloudinaryImagePath } from "@/lib/cloudinary";
 
 const stripePromise = loadStripe(import.meta.env.PUBLIC_STRIPE_PUBLISHABLE_KEY as string);
@@ -64,7 +64,6 @@ function StripePaymentForm({ userId, email, itemsPayload, shippingPayload, onBac
       const data = await res.json();
       if (!res.ok) { setError(data.error ?? "Errore durante la conferma."); setLoading(false); return; }
       window.location.href = `/ordine/${data.orderId}`;
-      clearCart();
     }
   }
 

@@ -23,6 +23,10 @@ const shortId = id.slice(0, 8).toUpperCase();
 ---
 
 <Layout title={`Ordine #${shortId}`}>
+  <script>
+    // Clear cart on order confirmation — avoids flash on checkout page
+    Object.keys(localStorage).filter(k => k.startsWith("cart:")).forEach(k => localStorage.removeItem(k));
+  </script>
   <div class="max-w-2xl">
     <div class="mb-8">
       <p class="text-sm text-green-600 font-medium mb-1">Ordine confermato</p>

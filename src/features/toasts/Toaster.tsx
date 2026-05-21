@@ -16,5 +16,5 @@ export default function Toaster() {
     }
   }, [items]);
 
-  return <SonnerToaster richColors position="bottom-right" />;
+  return <SonnerToaster richColors position="top-center" />;
 }

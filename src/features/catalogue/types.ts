@@ -22,14 +22,6 @@ export type FilterOption = {
   label: string;
 };
 
-export const ACTIVITIES: FilterOption[] = [
-  { id: "alpinismo",    label: "Alpinismo" },
-  { id: "scialpinismo", label: "Scialpinismo" },
-  { id: "trekking",     label: "Trekking" },
-  { id: "hiking",       label: "Hiking" },
-  { id: "arrampicata",  label: "Arrampicata" },
-  { id: "trail-running", label: "Trail running" },
-];
 
 export const GENDERS: FilterOption[] = [
   { id: "M", label: "Uomo" },
