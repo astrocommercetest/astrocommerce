@@ -1,4 +1,4 @@
-import { db, Brands, Products, Variants, Skus, Collections, User, Session, Account, Verification, eq } from "astro:db";
+import { db, Brands, Products, Variants, Skus, Collections, Activities, User, Session, Account, Verification, eq } from "astro:db";
 import { hashPassword } from "better-auth/crypto";
 import { randomUUID } from "node:crypto";
 import { readFileSync, readdirSync, existsSync, writeFileSync } from "node:fs";
@@ -154,6 +154,7 @@ export default async function seed() {
   await db.delete(Products);
   await db.delete(Brands);
   await db.delete(Collections);
+  await db.delete(Activities);
   await db.delete(Session);
   await db.delete(Account);
   await db.delete(Verification);
@@ -165,6 +166,16 @@ export default async function seed() {
   await db.insert(Skus).values(skus.map(toRow));
   // Collections are self-referential — insert parents before children
   await db.insert(Collections).values(collections);
+
+  await db.insert(Activities).values([
+    { id: "alpinismo", label: "Alpinismo" },
+    { id: "scialpinismo", label: "Scialpinismo" },
+    { id: "trekking", label: "Trekking" },
+    { id: "escursionismo", label: "Escursionismo" },
+    { id: "arrampicata", label: "Arrampicata" },
+    { id: "running", label: "Running" },
+    { id: "ciclismo", label: "Ciclismo" },
+  ]);
 
   const userId = randomUUID();
   const now = new Date();

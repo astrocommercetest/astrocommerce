@@ -37,6 +37,7 @@ import { cn } from "@/lib/utils";
 import { cloudinaryImagePath } from "@/lib/cloudinary";
 
 type Brand = { id: string; name: string };
+type Activity = { id: string; label: string };
 type Collection = {
   id: string;
   label: string;
@@ -67,14 +68,6 @@ type ProductData = {
   published: boolean;
 };
 
-const ACTIVITIES = [
-  "alpinismo",
-  "scialpinismo",
-  "trekking",
-  "arrampicata",
-  "running",
-  "ciclismo",
-];
 
 const EMPTY_SKU: SkuDraft = { size: "", price: "", stockQty: "" };
 const EMPTY_VARIANT: VariantDraft = {
@@ -154,6 +147,22 @@ export default function ProductForm() {
     queryKey: ["admin", "brands"],
     queryFn: () => fetch("/api/admin/brands").then((r) => r.json()),
   });
+
+  const { data: activities = [], refetch: refetchActivities } = useQuery<Activity[]>({
+    queryKey: ["admin", "activities"],
+    queryFn: () => fetch("/api/admin/activities").then((r) => r.json()),
+  });
+
+  const addActivityMutation = useMutation({
+    mutationFn: (label: string) => fetch("/api/admin/activities", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id: label.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, ""), label }),
+    }).then((r) => r.json()),
+    onSuccess: () => refetchActivities(),
+  });
+
+  const [newActivityLabel, setNewActivityLabel] = useState("");
 
   const { data: collections = [] } = useQuery<Collection[]>({
     queryKey: ["admin", "collections"],
@@ -537,25 +546,45 @@ export default function ProductForm() {
             Attività
           </h2>
           <div className="flex flex-wrap gap-x-6 gap-y-2">
-            {ACTIVITIES.map((a) => (
-              <div key={a} className="flex items-center gap-2">
+            {activities.map((a) => (
+              <div key={a.id} className="flex items-center gap-2">
                 <Checkbox
-                  id={`act-${a}`}
-                  checked={form.activity.includes(a)}
+                  id={`act-${a.id}`}
+                  checked={form.activity.includes(a.id)}
                   onCheckedChange={(checked) =>
                     setField(
                       "activity",
                       checked
-                        ? [...form.activity, a]
-                        : form.activity.filter((x) => x !== a),
+                        ? [...form.activity, a.id]
+                        : form.activity.filter((x) => x !== a.id),
                     )
                   }
                 />
-                <label htmlFor={`act-${a}`} className="text-sm cursor-pointer">
-                  {a}
+                <label htmlFor={`act-${a.id}`} className="text-sm cursor-pointer">
+                  {a.label}
                 </label>
               </div>
             ))}
+          </div>
+          <div className="flex gap-2 mt-1">
+            <Input
+              placeholder="Nuova attività…"
+              value={newActivityLabel}
+              onChange={(e) => setNewActivityLabel(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") { e.preventDefault(); if (newActivityLabel.trim()) { addActivityMutation.mutate(newActivityLabel.trim()); setNewActivityLabel(""); } }
+              }}
+              className="max-w-48"
+            />
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              disabled={!newActivityLabel.trim() || addActivityMutation.isPending}
+              onClick={() => { addActivityMutation.mutate(newActivityLabel.trim()); setNewActivityLabel(""); }}
+            >
+              <Plus className="h-4 w-4 mr-1" /> Aggiungi
+            </Button>
           </div>
         </section>
 

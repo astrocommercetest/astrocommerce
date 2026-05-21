@@ -157,6 +157,13 @@ const OrdersTable = defineTable({
   indexes: [{ on: ["userId"] }, { on: ["createdAt"] }],
 });
 
+const ActivitiesTable = defineTable({
+  columns: {
+    id: column.text({ primaryKey: true }), // slug, e.g. "escursionismo"
+    label: column.text(),
+  },
+});
+
 export default defineDb({
   tables: {
     Products: ProductsTable,
@@ -169,5 +176,6 @@ export default defineDb({
     Account: AccountTable,
     Verification: VerificationTable,
     Orders: OrdersTable,
+    Activities: ActivitiesTable,
   },
 });
