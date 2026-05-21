@@ -1,5 +1,5 @@
 [build]
-  command = "astro build"
+  command = "astro build --remote"
   publish = "dist"
 
 [build.environment]
