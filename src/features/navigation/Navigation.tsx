@@ -4,6 +4,13 @@ import CartBadge from "../cart/CartBadge";
 import type { TopLevelItem } from "./types";
 import { authClient } from "@/lib/auth-client";
 import Avatar from "@/features/auth/Avatar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface Props {
   items: TopLevelItem[];
@@ -17,17 +24,32 @@ function UserMenu() {
 
   if (session?.user) {
     return (
-      <div className="flex items-center gap-3 text-sm">
-        <Avatar name={session.user.name} size="sm" />
-        <button
-          onClick={() =>
-            authClient.signOut({ fetchOptions: { onSuccess: () => { window.location.href = "/"; } } })
-          }
-          className="underline"
-        >
-          Esci
-        </button>
-      </div>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <button className="rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400">
+            <Avatar name={session.user.name} size="sm" />
+          </button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="w-44">
+          <div className="px-2 py-1.5">
+            <p className="text-sm font-medium truncate">{session.user.name}</p>
+            <p className="text-xs text-muted-foreground truncate">{session.user.email}</p>
+          </div>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem asChild>
+            <a href="/ordini">I miei ordini</a>
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem
+            className="text-red-600 focus:text-red-600"
+            onSelect={() =>
+              authClient.signOut({ fetchOptions: { onSuccess: () => { window.location.href = "/"; } } })
+            }
+          >
+            Esci
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
     );
   }
 

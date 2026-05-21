@@ -8,11 +8,12 @@ import {
   Outlet,
 } from "@tanstack/react-router";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { Package, LayoutDashboard, ExternalLink } from "lucide-react";
+import { Package, LayoutDashboard, ExternalLink, ShoppingBag } from "lucide-react";
 import Toaster from "@/features/toasts/Toaster";
 import { Separator } from "@/components/ui/separator";
 import ProductList from "./ProductList";
 import ProductForm from "./ProductForm";
+import OrderList from "./OrderList";
 
 const queryClient = new QueryClient();
 const hashHistory = createHashHistory();
@@ -47,6 +48,14 @@ const rootRoute = createRootRoute({
           <Link to="/products" className={linkClass} activeProps={{ className: `${linkClass} ${activeClass}` }}>
             <Package className="h-4 w-4" />
             Prodotti
+          </Link>
+
+          <p className="text-[11px] text-muted-foreground uppercase tracking-widest font-medium px-3 mt-3 mb-1">
+            Vendite
+          </p>
+          <Link to="/orders" className={linkClass} activeProps={{ className: `${linkClass} ${activeClass}` }}>
+            <ShoppingBag className="h-4 w-4" />
+            Ordini
           </Link>
         </nav>
 
@@ -101,11 +110,18 @@ const editProductRoute = createRoute({
   component: () => <ProductForm />,
 });
 
+const ordersRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/orders",
+  component: OrderList,
+});
+
 const routeTree = rootRoute.addChildren([
   dashboardRoute,
   productsRoute,
   newProductRoute,
   editProductRoute,
+  ordersRoute,
 ]);
 
 const router = createRouter({ routeTree, history: hashHistory });

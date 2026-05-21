@@ -1,0 +1,58 @@
+---
+import Layout from "../layouts/Layout.astro";
+import { db, Orders, eq } from "astro:db";
+
+const user = Astro.locals.user;
+if (!user) return Astro.redirect("/login?redirect=/ordini");
+
+const orders = await db
+  .select()
+  .from(Orders)
+  .where(eq(Orders.userId, user.id));
+
+orders.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+
+type OrderItem = { productName: string; color: string | null; size: number | null; qty: number; unitPrice: number };
+---
+
+<Layout title="I miei ordini">
+  <div class="max-w-2xl mx-auto">
+    <h1 class="text-2xl font-bold mb-6">I miei ordini</h1>
+
+    {orders.length === 0 && (
+      <p class="text-sm text-gray-500">
+        Nessun ordine trovato.{" "}
+        <a href="/" class="underline">Continua lo shopping</a>
+      </p>
+    )}
+
+    <div class="flex flex-col gap-4">
+      {orders.map((order) => {
+        const items = order.items as OrderItem[];
+        const shortId = order.id.slice(0, 8).toUpperCase();
+        const date = new Date(order.createdAt).toLocaleDateString("it-IT", {
+          day: "2-digit", month: "long", year: "numeric",
+        });
+        return (
+          <a
+            href={`/ordine/${order.id}`}
+            class="border border-gray-200 rounded-lg p-4 hover:border-gray-400 transition-colors block"
+          >
+            <div class="flex items-center justify-between mb-2">
+              <span class="font-semibold text-sm">Ordine #{shortId}</span>
+              <span class={`text-xs px-2 py-0.5 rounded-full ${order.status === "paid" ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500"}`}>
+                {order.status === "paid" ? "Pagato" : order.status}
+              </span>
+            </div>
+            <p class="text-xs text-gray-500 mb-2">{date}</p>
+            <p class="text-sm text-gray-600">
+              {items.slice(0, 2).map((i) => `${i.productName}${i.color ? ` (${i.color})` : ""}`).join(", ")}
+              {items.length > 2 ? ` +${items.length - 2} altri` : ""}
+            </p>
+            <p class="text-sm font-semibold mt-2">€{order.subtotal.toFixed(2)}</p>
+          </a>
+        );
+      })}
+    </div>
+  </div>
+</Layout>
