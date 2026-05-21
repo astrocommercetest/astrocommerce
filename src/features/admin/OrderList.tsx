@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { useNavigate } from "@tanstack/react-router";
 import { Badge } from "@/components/ui/badge";
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
@@ -22,6 +23,7 @@ function StatusBadge({ status }: { status: string }) {
 }
 
 export default function OrderList() {
+  const navigate = useNavigate();
   const { data: orders = [], isLoading, isError } = useQuery<Order[]>({
     queryKey: ["admin", "orders"],
     queryFn: () => fetch("/api/admin/orders").then((r) => r.json()),
@@ -58,7 +60,11 @@ export default function OrderList() {
               </TableRow>
             )}
             {orders.map((o) => (
-              <TableRow key={o.id}>
+              <TableRow
+                key={o.id}
+                className="cursor-pointer"
+                onClick={() => navigate({ to: "/orders/$id", params: { id: o.id } })}
+              >
                 <TableCell className="font-mono text-xs">
                   #{o.id.slice(0, 8).toUpperCase()}
                 </TableCell>

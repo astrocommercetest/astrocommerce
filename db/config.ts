@@ -150,6 +150,7 @@ const OrdersTable = defineTable({
     shippingPhone: column.text(),
     notes: column.text({ optional: true }),
     paymentRef: column.text({ optional: true }),
+    emailId: column.text({ optional: true }),
     paidAt: column.date({ optional: true }),
     createdAt: column.date(),
     updatedAt: column.date(),

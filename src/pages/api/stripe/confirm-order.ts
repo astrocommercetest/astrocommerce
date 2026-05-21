@@ -70,7 +70,10 @@ export const POST: APIRoute = async ({ request }) => {
   const recipientEmail = userId ? (await db.select().from(User).where(eq(User.id, userId)))[0]?.email : guestEmail;
   if (recipientEmail) {
     const itemLines = snapshots.map((s) => `- ${s.productName} (${s.color ?? ""}, EU ${s.size ?? ""}) × ${s.qty} — €${(s.unitPrice * s.qty).toFixed(2)}`).join("\n");
-    void sendEmail({ to: recipientEmail, subject: `Conferma ordine #${orderId.slice(0, 8).toUpperCase()}`, text: `Grazie per il tuo ordine!\n\nOrdine: #${orderId.slice(0, 8).toUpperCase()}\n\nArticoli:\n${itemLines}\n\nTotale: €${subtotal.toFixed(2)}\n\nSpedizione a:\n${shipping.name}\n${shipping.address}\n${shipping.zip} ${shipping.city} (${shipping.province})\nTel: ${shipping.phone}${shipping.notes ? `\nNote: ${shipping.notes}` : ""}` });
+    sendEmail({ to: recipientEmail, subject: `Conferma ordine #${orderId.slice(0, 8).toUpperCase()}`, text: `Grazie per il tuo ordine!\n\nOrdine: #${orderId.slice(0, 8).toUpperCase()}\n\nArticoli:\n${itemLines}\n\nTotale: €${subtotal.toFixed(2)}\n\nSpedizione a:\n${shipping.name}\n${shipping.address}\n${shipping.zip} ${shipping.city} (${shipping.province})\nTel: ${shipping.phone}${shipping.notes ? `\nNote: ${shipping.notes}` : ""}` })
+      .then((emailId) => {
+        if (emailId) db.update(Orders).set({ emailId }).where(eq(Orders.id, orderId));
+      });
   }
 
   return Response.json({ orderId });

@@ -14,6 +14,7 @@ import { Separator } from "@/components/ui/separator";
 import ProductList from "./ProductList";
 import ProductForm from "./ProductForm";
 import OrderList from "./OrderList";
+import OrderDetail from "./OrderDetail";
 
 const queryClient = new QueryClient();
 const hashHistory = createHashHistory();
@@ -116,12 +117,19 @@ const ordersRoute = createRoute({
   component: OrderList,
 });
 
+const orderDetailRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/orders/$id",
+  component: OrderDetail,
+});
+
 const routeTree = rootRoute.addChildren([
   dashboardRoute,
   productsRoute,
   newProductRoute,
   editProductRoute,
   ordersRoute,
+  orderDetailRoute,
 ]);
 
 const router = createRouter({ routeTree, history: hashHistory });
