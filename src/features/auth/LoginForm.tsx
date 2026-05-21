@@ -17,7 +17,7 @@ export default function LoginForm({
     e.preventDefault();
     setError(null);
     setLoading(true);
-    const { error } = await authClient.signIn.email(
+    const { data, error } = await authClient.signIn.email(
       { email, password },
       {
         onError: (ctx) => {
@@ -31,7 +31,8 @@ export default function LoginForm({
     );
     setLoading(false);
     if (!error) {
-      window.location.href = redirectTo;
+      const role = (data?.user as { role?: string } | null)?.role;
+      window.location.href = role === "admin" ? "/admin" : redirectTo;
     }
   }
 

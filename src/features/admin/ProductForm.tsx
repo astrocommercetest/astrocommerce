@@ -12,6 +12,7 @@ import {
   XCircle,
   ChevronDown,
   ChevronRight,
+  Copy,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -49,7 +50,7 @@ type SkuDraft = { size: string; price: string; stockQty: string };
 type VariantDraft = {
   color: string;
   imageIds: string[];
-  uploading: boolean;
+  uploading: number;
   skus: SkuDraft[];
   open: boolean;
 };
@@ -73,7 +74,7 @@ const EMPTY_SKU: SkuDraft = { size: "", price: "", stockQty: "" };
 const EMPTY_VARIANT: VariantDraft = {
   color: "",
   imageIds: [],
-  uploading: false,
+  uploading: 0,
   skus: [{ ...EMPTY_SKU }],
   open: true,
 };
@@ -214,7 +215,7 @@ export default function ProductForm() {
         }) => ({
           color: v.color ?? "",
           imageIds: (v.imageIds as string[]) ?? [],
-          uploading: false,
+          uploading: 0,
           open: false,
           skus: (v.skus ?? []).map((s) => ({
             size: s.size != null ? String(s.size) : "",
@@ -278,6 +279,23 @@ export default function ProductForm() {
     }));
   }
 
+  function duplicateVariant(vi: number) {
+    setForm((f) => {
+      const src = f.variants[vi];
+      const copy: VariantDraft = {
+        ...src,
+        color: `${src.color} (copia)`,
+        imageIds: [...src.imageIds],
+        skus: src.skus.map((s) => ({ ...s })),
+        uploading: 0,
+        open: true,
+      };
+      const variants = [...f.variants];
+      variants.splice(vi + 1, 0, copy);
+      return { ...f, variants };
+    });
+  }
+
   function updateSku(vi: number, si: number, patch: Partial<SkuDraft>) {
     setForm((f) => {
       const variants = [...f.variants];
@@ -311,14 +329,15 @@ export default function ProductForm() {
   }
 
   async function handleImageUpload(vi: number, file: File) {
-    updateVariant(vi, { uploading: true });
+    setForm((f) => {
+      const variants = [...f.variants];
+      variants[vi] = { ...variants[vi], uploading: variants[vi].uploading + 1 };
+      return { ...f, variants };
+    });
     const fd = new FormData();
     fd.append("file", file);
     try {
-      const res = await fetch("/api/admin/upload", {
-        method: "POST",
-        body: fd,
-      });
+      const res = await fetch("/api/admin/upload", { method: "POST", body: fd });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
       setForm((f) => {
@@ -326,12 +345,16 @@ export default function ProductForm() {
         variants[vi] = {
           ...variants[vi],
           imageIds: [...variants[vi].imageIds, data.publicId],
-          uploading: false,
+          uploading: Math.max(0, variants[vi].uploading - 1),
         };
         return { ...f, variants };
       });
     } catch {
-      updateVariant(vi, { uploading: false });
+      setForm((f) => {
+        const variants = [...f.variants];
+        variants[vi] = { ...variants[vi], uploading: Math.max(0, variants[vi].uploading - 1) };
+        return { ...f, variants };
+      });
     }
   }
 
@@ -688,18 +711,26 @@ export default function ProductForm() {
                     </span>
                   )}
                 </div>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  className="h-7 w-7"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    removeVariant(vi);
-                  }}
-                >
-                  <Trash2 className="h-3.5 w-3.5 text-muted-foreground" />
-                </Button>
+                <div className="flex">
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="h-7 w-7"
+                    onClick={(e) => { e.stopPropagation(); duplicateVariant(vi); }}
+                  >
+                    <Copy className="h-3.5 w-3.5 text-muted-foreground" />
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="h-7 w-7"
+                    onClick={(e) => { e.stopPropagation(); removeVariant(vi); }}
+                  >
+                    <Trash2 className="h-3.5 w-3.5 text-muted-foreground" />
+                  </Button>
+                </div>
               </CollapsibleTrigger>
 
               <CollapsibleContent>
@@ -761,10 +792,10 @@ export default function ProductForm() {
                       <button
                         type="button"
                         onClick={() => fileInputRefs.current[vi]?.click()}
-                        disabled={variant.uploading}
+                        disabled={variant.uploading > 0}
                         className="w-20 h-20 border-2 border-dashed border-border rounded-md flex flex-col items-center justify-center gap-1 text-muted-foreground hover:border-foreground hover:text-foreground transition-colors disabled:opacity-50"
                       >
-                        {variant.uploading ? (
+                        {variant.uploading > 0 ? (
                           <Loader2 className="h-5 w-5 animate-spin" />
                         ) : (
                           <>
@@ -779,10 +810,12 @@ export default function ProductForm() {
                         }}
                         type="file"
                         accept="image/*"
+                        multiple
                         className="hidden"
                         onChange={(e) => {
-                          const file = e.target.files?.[0];
-                          if (file) handleImageUpload(vi, file);
+                          Array.from(e.target.files ?? []).forEach((file) =>
+                            handleImageUpload(vi, file),
+                          );
                           e.target.value = "";
                         }}
                       />

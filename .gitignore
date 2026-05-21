@@ -25,3 +25,6 @@ pnpm-debug.log*
 
 # Cloudinary upload cache (local only)
 testdata/.image-manifest.json
+
+# Local Netlify folder
+.netlify

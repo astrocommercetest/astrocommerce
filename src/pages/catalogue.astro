@@ -14,11 +14,25 @@ const activeFilters: ActiveFilters = {
 const page     = Math.max(1, parseInt(p.get("page") ?? "1"));
 const PAGE_SIZE = 24;
 
+// Fetch collections first so we can expand parent → children
+const allCollections = await db.select().from(Collections);
+
+// Expand selected collection to include all descendants
+const collectionIdsToMatch: string[] = [];
+if (activeFilters.collection) {
+  collectionIdsToMatch.push(activeFilters.collection);
+  for (const c of allCollections) {
+    if (c.parentId === activeFilters.collection) collectionIdsToMatch.push(c.id);
+  }
+}
+
 // Build SQL conditions pushed to the DB
 const conditions = [];
-if (activeFilters.collection) {
+if (collectionIdsToMatch.length > 0) {
   conditions.push(
-    sql`EXISTS (SELECT 1 FROM json_each(${Products.collectionIds}) WHERE value = ${activeFilters.collection})`
+    or(...collectionIdsToMatch.map((id) =>
+      sql`EXISTS (SELECT 1 FROM json_each(${Products.collectionIds}) WHERE value = ${id})`
+    ))!
   );
 }
 if (activeFilters.gender.length > 0) {
@@ -45,8 +59,7 @@ if (activeFilters.brand.length > 0) {
 const where = and(...conditions);
 
 // Run data fetch + count in parallel
-const [allCollections, allBrands, rows, countRows] = await Promise.all([
-  db.select().from(Collections),
+const [allBrands, rows, countRows] = await Promise.all([
   db.select().from(BrandsTable),
   db.select()
     .from(Products)
