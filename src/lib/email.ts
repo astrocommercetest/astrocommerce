@@ -11,23 +11,17 @@ export async function sendEmail({
     if (import.meta.env.RESEND_API_KEY) {
       const { Resend } = await import("resend");
       const resend = new Resend(import.meta.env.RESEND_API_KEY as string);
-      await resend.emails.send({
+      const result = await resend.emails.send({
         from: "AstroCommerce <onboarding@resend.dev>",
         to,
         subject,
         text,
       });
+      if (result.error) throw new Error(result.error.message);
+      console.log(`[email] sent via Resend "${subject}" to ${to}`, result.data?.id);
     } else {
-      const { createTransport } = await import("nodemailer");
-      const transporter = createTransport({ host: "localhost", port: 1025, secure: false });
-      await transporter.sendMail({
-        from: '"AstroCommerce" <noreply@astrocommerce.dev>',
-        to,
-        subject,
-        text,
-      });
+      console.warn("[email] RESEND_API_KEY not set — skipping email in production");
     }
-    console.log(`[email] sent "${subject}" to ${to}`);
   } catch (err) {
     console.error("[email] failed to send:", err);
   }
